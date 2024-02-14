@@ -16,9 +16,9 @@ object filter {
     spark.conf.set("spark.sql.session.timeZone", "UTC")
     println("Allocated", LocalDateTime.now())
 
-    val topicName: String = spark.sparkContext.getConf.get("topic_name")
-    val offset: String = spark.sparkContext.getConf.get("offset")
-    val outputDirPrefix: String = spark.sparkContext.getConf.get("output_dir_prefix")
+    val topicName: String = spark.sparkContext.getConf.get("spark.filter.topic_name")
+    val offset: String = spark.sparkContext.getConf.get("spark.filter.offset")
+    val outputDirPrefix: String = spark.sparkContext.getConf.get("spark.filter.output_dir_prefix")
 
     import spark.implicits._
 
