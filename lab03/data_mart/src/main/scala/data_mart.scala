@@ -129,8 +129,7 @@ object data_mart {
     def grantTable(): Unit = {
       val driverClass: Class[Driver] = classOf[org.postgresql.Driver]
       val driver: Any = Class.forName("org.postgresql.Driver").newInstance()
-      val url =
-        "jdbc:postgresql://10.0.0.31:5432/mihail_bulankin?user=mihail_bulankin&password=fBjEoAzs"
+      val url = "jdbc:postgresql://10.0.0.31:5432/mihail_bulankin?user=mihail_bulankin&password=fBjEoAzs"
       val connection: Connection = DriverManager.getConnection(url)
       val statement: Statement = connection.createStatement()
       val bool: Boolean =
