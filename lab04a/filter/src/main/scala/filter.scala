@@ -16,30 +16,25 @@ object filter {
     spark.conf.set("spark.sql.session.timeZone", "UTC")
     println("Allocated", LocalDateTime.now())
 
-    val topicName: String = spark.sparkContext.getConf.get("spark.filter.topic_name")
+    val master: String = spark.sparkContext.getConf.get("spark.master")
+    val topicName: String =
+      spark.sparkContext.getConf.get("spark.filter.topic_name")
     val offset: String = spark.sparkContext.getConf.get("spark.filter.offset")
-    val outputDirPrefix: String = spark.sparkContext.getConf.get("spark.filter.output_dir_prefix")
+    val outputDirPrefix: String =
+      spark.sparkContext.getConf.get("spark.filter.output_dir_prefix")
 
     import spark.implicits._
-
-    val logsCount:Long = spark
-      .read
-      .format("kafka")
-      .option("kafka.bootstrap.servers", "spark-master-1:6667")
-      .option("subscribe", "lab04_input_data")
-      .option("startingOffsets", "earliest")
-      .load().count()
 
     val logs = spark.read
       .format("kafka")
       .option("kafka.bootstrap.servers", "spark-master-1:6667")
       .option("subscribe", "lab04_input_data")
-      .option("startingOffsets",
-        if(offset.contains("earliest"))
+      .option(
+        "startingOffsets",
+        if (offset.contains("earliest"))
           offset
         else {
-          val startingOffset: String = (logsCount - offset.toLong).toString
-          "{\"" + topicName + "\":{\"0\":" + startingOffset + "}}"
+          "{\"" + topicName + "\":{\"0\":" + offset + "}}"
         }
       )
       .load()
@@ -56,7 +51,8 @@ object filter {
       )
     )
 
-    val dfWithJson: DataFrame = logs.select(from_json($"value", schema).as("data"))
+    val dfWithJson: DataFrame =
+      logs.select(from_json($"value", schema).as("data"))
     val unpackedJson: DataFrame = dfWithJson.select("data.*")
 
     val df: DataFrame = unpackedJson
@@ -78,14 +74,26 @@ object filter {
     dfBuy.write
       .partitionBy("p_date")
       .mode("overwrite")
-      .json(s"hdfs://$outputDirPrefix/buy")
+      .json(
+        if (offset.contains("local[1]"))
+          s"hdfs://$outputDirPrefix/buy"
+        else {
+          s"$outputDirPrefix/buy"
+        }
+      )
 
     val dfView: DataFrame = df.filter($"event_type" === "view")
 
     dfView.write
       .partitionBy("p_date")
       .mode("overwrite")
-      .json(s"hdfs://$outputDirPrefix/view")
+      .json(
+        if (offset.contains("local[1]"))
+          s"hdfs://$outputDirPrefix/view"
+        else {
+          s"$outputDirPrefix/buy"
+        }
+      )
 
     println("DIRECTED BY ROBERT B.WEIDE", LocalDateTime.now())
   }
