@@ -22,6 +22,14 @@ object filter {
 
     import spark.implicits._
 
+    val logsCount:Long = spark
+      .read
+      .format("kafka")
+      .option("kafka.bootstrap.servers", "spark-master-1:6667")
+      .option("subscribe", "lab04_input_data")
+      .option("startingOffsets", "earliest")
+      .load().count()
+
     val logs = spark.read
       .format("kafka")
       .option("kafka.bootstrap.servers", "spark-master-1:6667")
@@ -30,7 +38,8 @@ object filter {
         if(offset.contains("earliest"))
           offset
         else {
-          "{\"" + topicName + "\":{\"0\":" + offset + "}}"
+          val startingOffset: String = (logsCount - offset.toLong).toString
+          "{\"" + topicName + "\":{\"0\":" + startingOffset + "}}"
         }
       )
       .load()
