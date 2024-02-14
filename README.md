@@ -9,8 +9,8 @@ cd lab04a/filter
 sbt package
 spark-submit --conf spark.filter.topic_name=lab04_input_data --conf spark.filter.offset=earliest --conf spark.filter.output_dir_prefix=/user/mihail.bulankin/visits --class filter --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.4.5 ./target/scala-2.11/filter_2.11-1.0.jar
 
-### example download file from server
+## example download file from server
 scp -i ~/.ssh/id_rsa_spark_de -r mihail.bulankin@spark-master-2.newprolab.com:/data/home/mihail.bulankin/ml-100k /Users/m.bulankin/spark_de_course/lab01
 
-### example upload file to server
+## example upload file to server
 scp -i ~/.ssh/id_rsa_spark_de -r lab01.json mihail.bulankin@spark-master-2.newprolab.com:/data/home/mihail.bulankin
