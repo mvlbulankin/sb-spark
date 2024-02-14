@@ -70,30 +70,20 @@ object filter {
       )
 
     val dfBuy: DataFrame = df.filter($"event_type" === "buy")
+    val jsonPathBuy: String = if (master.contains("local[1]")) s"file://$outputDirPrefix/buy" else s"hdfs://$outputDirPrefix/buy"
 
     dfBuy.write
       .partitionBy("p_date")
       .mode("overwrite")
-      .json(
-        if (offset.contains("local[1]"))
-          s"hdfs://$outputDirPrefix/buy"
-        else {
-          s"$outputDirPrefix/buy"
-        }
-      )
+      .json(jsonPathBuy)
 
     val dfView: DataFrame = df.filter($"event_type" === "view")
+    val jsonPathView: String = if (master.contains("local[1]")) s"file://$outputDirPrefix/view" else s"hdfs://$outputDirPrefix/view"
 
     dfView.write
       .partitionBy("p_date")
       .mode("overwrite")
-      .json(
-        if (offset.contains("local[1]"))
-          s"hdfs://$outputDirPrefix/view"
-        else {
-          s"$outputDirPrefix/buy"
-        }
-      )
+      .json(jsonPathView)
 
     println("DIRECTED BY ROBERT B.WEIDE", LocalDateTime.now())
   }
