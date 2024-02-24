@@ -36,6 +36,7 @@ object users_items {
 
     val unionDf: DataFrame = buys.union(views)
     val maxDate: String = unionDf.select(max($"date")).first().getString(0)
+    println(maxDate, LocalDateTime.now())
 
     val newDataDf: DataFrame =
       unionDf.groupBy("uid").pivot("item_id").count().na.fill(0)
