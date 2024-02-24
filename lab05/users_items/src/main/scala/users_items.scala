@@ -29,7 +29,9 @@ object users_items {
       spark.sparkContext.getConf.get("spark.users_items.output_dir")
 
     val jsonPathBuy: String = s"$inputDirPrefix/buy/*"
+    println(jsonPathBuy, LocalDateTime.now())
     val jsonPathView: String = s"$inputDirPrefix/view/*"
+    println(jsonPathView, LocalDateTime.now())
 
     val buys: DataFrame = spark.read
       .json(jsonPathBuy)
@@ -68,13 +70,12 @@ object users_items {
 //      )
 
       // Получаем список папок в указанном каталоге
+//      import java.io.File
+
+//      val outputDirPrefix = "file:///$checker_dir/users-items"
       val dir = new File(outputDirPrefix)
-      println(dir, LocalDateTime.now())
-      val subDirs = dir.listFiles.filter(_.isDirectory)
-
-
-      // Находим максимальную дату среди всех объектов LocalDate
-      val latestSubDir:String = subDirs.max.toString
+      val subDirs = dir.listFiles.filter(_.isDirectory).map(_.getName)
+      val latestSubDir = subDirs.max
       println(latestSubDir, LocalDateTime.now())
 
 
