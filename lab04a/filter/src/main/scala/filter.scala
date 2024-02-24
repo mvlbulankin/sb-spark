@@ -17,11 +17,9 @@ object filter {
     println("Allocated", LocalDateTime.now())
 
     val master: String = spark.sparkContext.getConf.get("spark.master")
-    val topicName: String =
-      spark.sparkContext.getConf.get("spark.filter.topic_name")
+    val topicName: String = spark.sparkContext.getConf.get("spark.filter.topic_name")
     val offset: String = spark.sparkContext.getConf.get("spark.filter.offset")
-    val outputDirPrefix: String =
-      spark.sparkContext.getConf.get("spark.filter.output_dir_prefix")
+    val outputDirPrefix: String = spark.sparkContext.getConf.get("spark.filter.output_dir_prefix")
 
     import spark.implicits._
 
@@ -51,8 +49,7 @@ object filter {
       )
     )
 
-    val dfWithJson: DataFrame =
-      logs.select(from_json($"value", schema).as("data"))
+    val dfWithJson: DataFrame = logs.select(from_json($"value", schema).as("data"))
     val unpackedJson: DataFrame = dfWithJson.select("data.*")
 
     val df: DataFrame = unpackedJson

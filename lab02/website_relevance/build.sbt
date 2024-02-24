@@ -11,5 +11,5 @@ libraryDependencies ++= Seq(
 
 lazy val root = (project in file("."))
   .settings(
-    name := "lab02"
+    name := "website_relevance"
   )
