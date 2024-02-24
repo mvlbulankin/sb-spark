@@ -17,9 +17,13 @@ object filter {
     println("Allocated", LocalDateTime.now())
 
     val master: String = spark.sparkContext.getConf.get("spark.master")
+    println("master", master, LocalDateTime.now())
     val topicName: String = spark.sparkContext.getConf.get("spark.filter.topic_name")
+    println("topicName", topicName, LocalDateTime.now())
     val offset: String = spark.sparkContext.getConf.get("spark.filter.offset")
+    println("offset", offset, LocalDateTime.now())
     val outputDirPrefix: String = spark.sparkContext.getConf.get("spark.filter.output_dir_prefix")
+    println("outputDirPrefix", outputDirPrefix, LocalDateTime.now())
 
     import spark.implicits._
 
@@ -68,6 +72,7 @@ object filter {
 
     val dfBuy: DataFrame = df.filter($"event_type" === "buy")
     val jsonPathBuy: String = if (master.contains("local[1]")) s"$outputDirPrefix/buy" else s"hdfs://$outputDirPrefix/buy"
+    println("jsonPathBuy", jsonPathBuy, LocalDateTime.now())
 
     dfBuy.write
       .partitionBy("p_date")
@@ -76,6 +81,7 @@ object filter {
 
     val dfView: DataFrame = df.filter($"event_type" === "view")
     val jsonPathView: String = if (master.contains("local[1]")) s"$outputDirPrefix/view" else s"hdfs://$outputDirPrefix/view"
+    println("jsonPathView", jsonPathView, LocalDateTime.now())
 
     dfView.write
       .partitionBy("p_date")
