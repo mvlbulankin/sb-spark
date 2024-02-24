@@ -17,13 +17,13 @@ object filter {
     println("Allocated", LocalDateTime.now())
 
     val master: String = spark.sparkContext.getConf.get("spark.master")
-    println("master", master, LocalDateTime.now())
+    println("master", master)
     val topicName: String = spark.sparkContext.getConf.get("spark.filter.topic_name")
-    println("topicName", topicName, LocalDateTime.now())
+    println("topicName", topicName)
     val offset: String = spark.sparkContext.getConf.get("spark.filter.offset")
-    println("offset", offset, LocalDateTime.now())
+    println("offset", offset)
     val outputDirPrefix: String = spark.sparkContext.getConf.get("spark.filter.output_dir_prefix")
-    println("outputDirPrefix", outputDirPrefix, LocalDateTime.now())
+    println("outputDirPrefix", outputDirPrefix)
 
     import spark.implicits._
 
@@ -41,6 +41,7 @@ object filter {
       )
       .load()
       .selectExpr("CAST(value AS STRING)")
+    println("logs.count", logs.count())
 
     val schema: StructType = StructType(
       Seq(
@@ -71,8 +72,9 @@ object filter {
       )
 
     val dfBuy: DataFrame = df.filter($"event_type" === "buy")
-    val jsonPathBuy: String = if (master.contains("local[1]")) s"$outputDirPrefix/buy" else s"hdfs://$outputDirPrefix/buy"
-    println("jsonPathBuy", jsonPathBuy, LocalDateTime.now())
+    val jsonPathBuy: String =
+      if (master.contains("local[1]")) s"$outputDirPrefix/buy" else s"hdfs://$outputDirPrefix/buy"
+    println("jsonPathBuy", jsonPathBuy)
 
     dfBuy.write
       .partitionBy("p_date")
@@ -80,8 +82,9 @@ object filter {
       .json(jsonPathBuy)
 
     val dfView: DataFrame = df.filter($"event_type" === "view")
-    val jsonPathView: String = if (master.contains("local[1]")) s"$outputDirPrefix/view" else s"hdfs://$outputDirPrefix/view"
-    println("jsonPathView", jsonPathView, LocalDateTime.now())
+    val jsonPathView: String =
+      if (master.contains("local[1]")) s"$outputDirPrefix/view" else s"hdfs://$outputDirPrefix/view"
+    println("jsonPathView", jsonPathView)
 
     dfView.write
       .partitionBy("p_date")
