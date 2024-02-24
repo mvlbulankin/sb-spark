@@ -39,10 +39,12 @@ object users_items {
 
     val outputDir: String = s"$outputDirPrefix/$maxDate"
 
-    if (workMode == "0") {
+    if (workMode.contains("0")) {
+      println("workMode = 0", LocalDateTime.now())
       newDataDf.write.mode("overwrite").parquet(outputDir)
 
-    } else if (workMode == "1") {
+    } else if (workMode.contains("1")) {
+      println("workMode = 1", LocalDateTime.now())
       // Get the file system object
       val fs = FileSystem.get(spark.sparkContext.hadoopConfiguration)
 
@@ -72,6 +74,7 @@ object users_items {
 
       finalGroupedDf.write.mode("overwrite").parquet(outputDir)
     }
+    println("DIRECTED BY ROBERT B.WEIDE", LocalDateTime.now())
   }
 
 }
