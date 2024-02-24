@@ -73,14 +73,14 @@ object users_items {
 //      import java.io.File
 
 //      val outputDirPrefix = "file:///$checker_dir/users-items"
-      val dir = new File(outputDirPrefix)
-      val subDirs = dir.listFiles.filter(_.isDirectory).map(_.getName)
-      val latestSubDir = subDirs.max
-      println(latestSubDir, LocalDateTime.now())
+//      val dir = new File(outputDirPrefix)
+//      val subDirs = dir.listFiles.filter(_.isDirectory).map(_.getName)
+//      val latestSubDir = subDirs.max
+//      println(latestSubDir, LocalDateTime.now())
 
 
       // Read the data from the latest subdirectory
-      val oldDataDf: DataFrame = spark.read.format("parquet").load(latestSubDir)
+      val oldDataDf: DataFrame = spark.read.format("parquet").load(s"$outputDirPrefix/20200429")
 
       def expr(myCols: Set[String], allCols: Set[String]) = {
         allCols.toList.map(x =>
