@@ -1,10 +1,5 @@
-import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types._
-import java.io.File
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 import java.time.LocalDateTime
 
@@ -56,27 +51,6 @@ object users_items {
 
     } else if (workMode.contains("1")) {
       println("workMode = 1", LocalDateTime.now())
-//      // Get the file system object
-//      val fs = FileSystem.get(spark.sparkContext.hadoopConfiguration)
-//
-//      // Get the list of subdirectories
-//      val subDirs = fs
-//        .listStatus(new Path(s"${outputDirPrefix}/"))
-//        .filter(_.isDirectory)
-//        .map(_.getPath.toString)
-//
-//      // Get the latest subdirectory based on the date in the name
-//      val latestSubDir = subDirs.maxBy(_.split("/").last)
-//      )
-
-      // Получаем список папок в указанном каталоге
-//      import java.io.File
-
-//      val outputDirPrefix = "file:///$checker_dir/users-items"
-//      val dir = new File(outputDirPrefix)
-//      val subDirs = dir.listFiles.filter(_.isDirectory).map(_.getName)
-//      val latestSubDir = subDirs.max
-//      println(latestSubDir, LocalDateTime.now())
 
 
       // Read the data from the latest subdirectory
@@ -97,9 +71,9 @@ object users_items {
       val oldDataModifiedDf: DataFrame = oldDataDf.select(expr(oldDataCols, total_cols): _*)
       val newDataModifiedDf: DataFrame = newDataDf.select(expr(newDataCols, total_cols): _*)
       val finalDf: DataFrame = oldDataModifiedDf.union(newDataModifiedDf).distinct()
-      val finalGroupedDf: DataFrame = finalDf.groupBy("uid").sum(finalDf.columns.filter(_ != "uid"): _*)
+//      val finalGroupedDf: DataFrame = finalDf.groupBy("uid").sum(finalDf.columns.filter(_ != "uid"): _*)
 
-      finalGroupedDf.write.mode("overwrite").parquet(outputDir)
+      finalDf.write.mode("overwrite").parquet(outputDir)
     }
     println("DIRECTED BY ROBERT B.WEIDE", LocalDateTime.now())
   }
