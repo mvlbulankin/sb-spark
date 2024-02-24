@@ -16,12 +16,9 @@ object users_items {
 
     import spark.implicits._
 
-    val workMode: String =
-      spark.sparkContext.getConf.get("spark.users_items.update")
-    val inputDirPrefix: String =
-      spark.sparkContext.getConf.get("spark.users_items.input_dir")
-    val outputDirPrefix: String =
-      spark.sparkContext.getConf.get("spark.users_items.output_dir")
+    val workMode: String = spark.sparkContext.getConf.get("spark.users_items.update")
+    val inputDirPrefix: String = spark.sparkContext.getConf.get("spark.users_items.input_dir")
+    val outputDirPrefix: String = spark.sparkContext.getConf.get("spark.users_items.output_dir")
 
     val jsonPathBuy: String = s"$inputDirPrefix/buy/*"
     println(jsonPathBuy, LocalDateTime.now())
@@ -45,36 +42,37 @@ object users_items {
 
     val outputDir: String = s"$outputDirPrefix/$maxDate"
 
-    if (workMode.contains("0")) {
-      println("workMode = 0", LocalDateTime.now())
-      newDataDf.write.mode("overwrite").parquet(outputDir)
+//    newDataDf.write.mode("overwrite").parquet(outputDir)
 
-    } else if (workMode.contains("1")) {
-      println("workMode = 1", LocalDateTime.now())
-
-
-      // Read the data from the latest subdirectory
-      val oldDataDf: DataFrame = spark.read.format("parquet").load(s"$outputDirPrefix/20200429")
-
-      def expr(myCols: Set[String], allCols: Set[String]) = {
-        allCols.toList.map(x =>
-          x match {
-            case x if myCols.contains(x) => col(x)
-            case _                       => lit(0).as(x)
-          }
-        )
-      }
-
-      val newDataCols: Set[String] = newDataDf.columns.toSet
-      val oldDataCols: Set[String] = oldDataDf.columns.toSet
-      val total_cols: Set[String] = newDataCols ++ oldDataCols
-      val oldDataModifiedDf: DataFrame = oldDataDf.select(expr(oldDataCols, total_cols): _*)
-      val newDataModifiedDf: DataFrame = newDataDf.select(expr(newDataCols, total_cols): _*)
-      val finalDf: DataFrame = oldDataModifiedDf.union(newDataModifiedDf).distinct()
-//      val finalGroupedDf: DataFrame = finalDf.groupBy("uid").sum(finalDf.columns.filter(_ != "uid"): _*)
-
-      finalDf.write.mode("overwrite").parquet(outputDir)
-    }
+//    if (workMode.contains("0")) {
+//      println("workMode = 0", LocalDateTime.now())
+//
+//    } else if (workMode.contains("1")) {
+//      println("workMode = 1", LocalDateTime.now())
+//
+//
+//      // Read the data from the latest subdirectory
+//      val oldDataDf: DataFrame = spark.read.format("parquet").load(s"$outputDirPrefix/20200429")
+//
+//      def expr(myCols: Set[String], allCols: Set[String]) = {
+//        allCols.toList.map(x =>
+//          x match {
+//            case x if myCols.contains(x) => col(x)
+//            case _                       => lit(0).as(x)
+//          }
+//        )
+//      }
+//
+//      val newDataCols: Set[String] = newDataDf.columns.toSet
+//      val oldDataCols: Set[String] = oldDataDf.columns.toSet
+//      val total_cols: Set[String] = newDataCols ++ oldDataCols
+//      val oldDataModifiedDf: DataFrame = oldDataDf.select(expr(oldDataCols, total_cols): _*)
+//      val newDataModifiedDf: DataFrame = newDataDf.select(expr(newDataCols, total_cols): _*)
+//      val finalDf: DataFrame = oldDataModifiedDf.union(newDataModifiedDf).distinct()
+////      val finalGroupedDf: DataFrame = finalDf.groupBy("uid").sum(finalDf.columns.filter(_ != "uid"): _*)
+//
+//      finalDf.write.mode("overwrite").parquet(outputDir)
+//    }
     println("DIRECTED BY ROBERT B.WEIDE", LocalDateTime.now())
   }
 
