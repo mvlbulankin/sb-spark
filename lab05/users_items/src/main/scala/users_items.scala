@@ -47,7 +47,7 @@ object users_items {
       val fs = FileSystem.get(spark.sparkContext.hadoopConfiguration)
 
       // Get the list of subdirectories
-      val subDirs = fs.listStatus(new Path(s"${inputDirPrefix}/")).filter(_.isDirectory).map(_.getPath.toString)
+      val subDirs = fs.listStatus(new Path(s"${outputDirPrefix}/")).filter(_.isDirectory).map(_.getPath.toString)
 
       // Get the latest subdirectory based on the date in the name
       val latestSubDir = subDirs.maxBy(_.split("/").last)
@@ -65,11 +65,12 @@ object users_items {
       val newDataCols: Set[String] = newDataDf.columns.toSet
       val oldDataCols: Set[String] = oldDataDf.columns.toSet
       val total_cols: Set[String] = newDataCols ++ oldDataCols
-      val oldDataModifiedDf = oldDataDf.select(expr(newDataCols, total_cols):_*)
-      val newDataModifiedDf = newDataDf.select(expr(oldDataCols, total_cols):_*)
-      val final_df = oldDataModifiedDf.union(newDataModifiedDf).distinct()
+      val oldDataModifiedDf: DataFrame = oldDataDf.select(expr(oldDataCols, total_cols):_*)
+      val newDataModifiedDf: DataFrame = newDataDf.select(expr(newDataCols, total_cols):_*)
+      val finalDf: DataFrame = oldDataModifiedDf.union(newDataModifiedDf).distinct()
+      val finalGroupedDf: DataFrame = finalDf.groupBy("uid").sum(finalDf.columns.filter(_ != "uid"):_*)
 
-      final_df.write.mode("overwrite").parquet(outputDir)
+      finalGroupedDf.write.mode("overwrite").parquet(outputDir)
     }
   }
 
