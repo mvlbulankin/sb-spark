@@ -30,7 +30,7 @@ object filter {
     val logs = spark.read
       .format("kafka")
       .option("kafka.bootstrap.servers", "spark-master-1:6667")
-      .option("subscribe", "lab04_input_data")
+      .option("subscribe", "lab05_input_data")
       .option(
         "startingOffsets",
         if (offset.contains("earliest"))
