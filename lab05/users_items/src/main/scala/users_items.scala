@@ -36,44 +36,42 @@ object users_items {
 
     val unionDf: DataFrame = buys.union(views)
     val maxDate: String = unionDf.select(max($"date")).first().getString(0)
-    println(maxDate, LocalDateTime.now())
+    println("maxDate", maxDate)
 
-    val newDataDf: DataFrame =
+    val newDf: DataFrame =
       unionDf.groupBy("uid").pivot("item_id").count().na.fill(0)
 
     val outputDir: String = s"$outputDirPrefix/$maxDate"
 
-//    newDataDf.write.mode("overwrite").parquet(outputDir)
+    if (workMode.contains("0")) {
+      newDf.write.mode("overwrite").parquet(outputDir)
+      println("workMode = 0")
 
-//    if (workMode.contains("0")) {
-//      println("workMode = 0", LocalDateTime.now())
-//
-//    } else if (workMode.contains("1")) {
-//      println("workMode = 1", LocalDateTime.now())
-//
-//
-//      // Read the data from the latest subdirectory
-//      val oldDataDf: DataFrame = spark.read.format("parquet").load(s"$outputDirPrefix/20200429")
-//
-//      def expr(myCols: Set[String], allCols: Set[String]) = {
-//        allCols.toList.map(x =>
-//          x match {
-//            case x if myCols.contains(x) => col(x)
-//            case _                       => lit(0).as(x)
-//          }
-//        )
-//      }
-//
-//      val newDataCols: Set[String] = newDataDf.columns.toSet
-//      val oldDataCols: Set[String] = oldDataDf.columns.toSet
-//      val total_cols: Set[String] = newDataCols ++ oldDataCols
-//      val oldDataModifiedDf: DataFrame = oldDataDf.select(expr(oldDataCols, total_cols): _*)
-//      val newDataModifiedDf: DataFrame = newDataDf.select(expr(newDataCols, total_cols): _*)
-//      val finalDf: DataFrame = oldDataModifiedDf.union(newDataModifiedDf).distinct()
-////      val finalGroupedDf: DataFrame = finalDf.groupBy("uid").sum(finalDf.columns.filter(_ != "uid"): _*)
-//
-//      finalDf.write.mode("overwrite").parquet(outputDir)
-//    }
+    } else if (workMode.contains("1")) {
+      println("workMode = 1")
+
+      // Read the data from the latest subdirectory
+      val oldDf: DataFrame = spark.read.format("parquet").load(s"$outputDirPrefix/20200429")
+
+      def expr(myCols: Set[String], allCols: Set[String]) = {
+        allCols.toList.map(x =>
+          x match {
+            case x if myCols.contains(x) => col(x)
+            case _                       => lit(0).as(x)
+          }
+        )
+      }
+
+      val newDataCols: Set[String] = newDf.columns.toSet
+      val oldDataCols: Set[String] = oldDf.columns.toSet
+      val total_cols: Set[String] = newDataCols ++ oldDataCols
+      val oldDataModifiedDf: DataFrame = oldDf.select(expr(oldDataCols, total_cols): _*)
+      val newDataModifiedDf: DataFrame = newDf.select(expr(newDataCols, total_cols): _*)
+      val finalDf: DataFrame = oldDataModifiedDf.union(newDataModifiedDf).distinct()
+//      val finalGroupedDf: DataFrame = finalDf.groupBy("uid").sum(finalDf.columns.filter(_ != "uid"): _*)
+
+      finalDf.write.mode("overwrite").parquet(outputDir)
+    }
     println("DIRECTED BY ROBERT B.WEIDE", LocalDateTime.now())
   }
 
