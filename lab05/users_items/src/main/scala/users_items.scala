@@ -68,11 +68,17 @@ object users_items {
       val oldDataModifiedDf: DataFrame = oldDf.select(expr(oldDataCols, total_cols): _*)
       val newDataModifiedDf: DataFrame = newDf.select(expr(newDataCols, total_cols): _*)
       val finalDf: DataFrame = oldDataModifiedDf.union(newDataModifiedDf).distinct()
-//      val finalGroupedDf: DataFrame = finalDf.groupBy("uid").sum(finalDf.columns.filter(_ != "uid"): _*)
+//      // Собираем список колонок для суммирования (все кроме "uid")
+//      val columnsToSum = df.columns.filterNot(_ == "uid")
+//
+//      // Создаем список выражений для суммирования значений в остальных колонках
+//      val sumExpressions = columnsToSum.map(colName => sum(col(colName)).alias(colName))
+//
+//      // Выполняем группировку по полю "uid" и суммирование значений в остальных колонках
+//      val result = df.groupBy("uid").agg(sumExpressions.head, sumExpressions.tail: _*)
 
       finalDf.write.mode("overwrite").parquet(outputDir)
     }
     println("DIRECTED BY ROBERT B.WEIDE", LocalDateTime.now())
   }
-
 }
