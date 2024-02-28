@@ -51,6 +51,8 @@ object features {
         .setOutputCol("domain_features")
     val domainFeatures =
       cvModel.transform(webLogsCollected).select($"uid", $"domain_features")
+    val vectorToArray = udf((v: org.apache.spark.ml.linalg.Vector) => v.toArray)
+    val domainFeaturesInArray = domainFeatures.withColumn("domain_features", vectorToArray($"domain_features"))
 
     val webLogsVisitsCount: DataFrame = webLogsDecoded
       .withColumn("date_column", to_date(from_unixtime($"timestamp" / 1000)))
@@ -278,7 +280,7 @@ object features {
     val result: DataFrame = oldDf
       .alias("left")
       .join(webLogsGrouped.alias("mid"), Seq("uid"), "inner")
-      .join(domainFeatures.alias("right"), Seq("uid"), "inner")
+      .join(domainFeaturesInArray.alias("right"), Seq("uid"), "inner")
 
     result.write.mode("overwrite").parquet("/user/mihail.bulankin/features")
 

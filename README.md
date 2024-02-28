@@ -14,6 +14,11 @@
 + sbt package
 + spark-submit --conf spark.users_items.input_dir=/user/mihail.bulankin/visits --conf spark.users_items.output_dir=/user/mihail.bulankin/users-items --conf spark.users_items.update=0 --class users_items ./target/scala-2.11/users_items_2.11-1.0.jar
 
+## launch lab06
++ cd lab06/features
++ sbt package
++ spark-submit --class features .target/scala-2.11/features_2.11-1.0.jar 
+
 ## download file from server
 scp -i ~/.ssh/id_rsa_spark_de -r mihail.bulankin@spark-master-2.newprolab.com:/data/home/mihail.bulankin/ml-100k /Users/m.bulankin/spark_de_course/lab01
 
