@@ -146,8 +146,7 @@ object train {
 
     val model: PipelineModel = pipeline.fit(featuresDS)
 
-    model.write.overwrite
-      .save(hdfsModelPath)
+    model.write.overwrite.save(hdfsModelPath)
 
     println("DIRECTED BY ROBERT B.WEIDE", LocalDateTime.now())
   }
