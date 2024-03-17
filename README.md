@@ -1,4 +1,14 @@
 # sb-spark
+## launch lab01
++ cd lab01/film_analysis
++ sbt package 
++ spark-submit --class film_analysis target/scala-2.11/film_analysis_2.11-1.0.jar
+
+## launch lab02
++ cd lab02/website_relevance
++ sbt package 
++ spark-submit --class website_relevance target/scala-2.11/website_relevance_2.11-1.0.jar
+
 ## launch lab03
 + cd lab03/data_mart
 + sbt package 
@@ -9,6 +19,11 @@
 + sbt package
 + spark-submit --conf spark.filter.topic_name=lab04_input_data --conf spark.filter.offset=earliest --conf spark.filter.output_dir_prefix=/user/mihail.bulankin/visits --class filter --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.4.5 ./target/scala-2.11/filter_2.11-1.0.jar
 
+## launch lab04b
++ cd lab04b/agg
++ sbt package
++ spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.4.7 --class agg target/scala-2.11/agg_2.11-1.0.jar
+
 ## launch lab05
 + cd lab05/users_items
 + sbt package
@@ -17,7 +32,15 @@
 ## launch lab06
 + cd lab06/features
 + sbt package
-+ spark-submit --class features .target/scala-2.11/features_2.11-1.0.jar 
++ spark-submit --class features .target/scala-2.11/features_2.11-1.0.jar
+
+## launch lab07
+cd lab07/mlproject
+sbt package
+### training
+spark-submit --class train target/scala-2.11/mlproject_2.11-1.0.jar 
+### inference
+spark-submit --class test --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.4.7 target/scala-2.11/mlproject_2.11-1.0.jar  
 
 ## download file from server
 scp -i ~/.ssh/id_rsa_spark_de -r mihail.bulankin@spark-master-2.newprolab.com:/data/home/mihail.bulankin/ml-100k /Users/m.bulankin/spark_de_course/lab01

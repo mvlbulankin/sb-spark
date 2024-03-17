@@ -81,14 +81,15 @@ object agg {
       .select($"value")
 
     def createKafkaSinkWithCheckpoint(chkName: String, df: DataFrame) = {
-      df.writeStream
-        .outputMode("update")
-        .trigger(Trigger.ProcessingTime("5 seconds"))
-        .option("checkpointLocation", s"/tmp/$chkName")
-        .option("truncate", "false")
-        .format("kafka")
-        .option("kafka.bootstrap.servers", "spark-master-1.newprolab.com:6667")
-        .option("topic", "mihail_bulankin_lab04b_out")
+      df
+      .writeStream
+      .outputMode("update")
+      .trigger(Trigger.ProcessingTime("5 seconds"))
+      .option("checkpointLocation", s"/tmp/$chkName")
+      .option("truncate", "false")
+      .format("kafka")
+      .option("kafka.bootstrap.servers", "spark-master-1.newprolab.com:6667")
+      .option("topic", "mihail_bulankin_lab04b_out")
     }
 
     val sink: DataStreamWriter[Row] = createKafkaSinkWithCheckpoint("test_mvl_0", parsedSdf)
