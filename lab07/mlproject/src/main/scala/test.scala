@@ -36,14 +36,14 @@ object test {
         "mihail_bulankin")
     val kafkaTestOutputTopic: String =
       spark.conf.get("spark.mlproject.test.kafka.output_topic",
-        "mihail_bulankin_lab04b_out")
+        "mihail_bulankin_lab07_out")
 
     val formatter: DateTimeFormatter =
       DateTimeFormatter.ofPattern("yyyy_MM_dd_hh_mm_ss")
     val dateTimeNow: String = LocalDateTime.now.format(formatter)
     val kafkaCheckPointLocation = spark.conf.get(
       "spark.agg.kafka.checkpoint.location",
-      s"/tmp/mihail.bulankin/chk/lab04/state_${dateTimeNow}_${Random.nextInt(1000)}"
+      s"/tmp/mihail.bulankin/chk/lab07/state_${dateTimeNow}_${Random.nextInt(1000)}"
     )
 
     val kafkaOptions: Map[String, String] =
