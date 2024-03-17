@@ -54,9 +54,6 @@ object test {
         "subscribe" -> kafkaTestInputTopic
       )
 
-//    case class Visit(timestamp: Long, url: String)
-//    case class TestData(uid: String, visits: Array[Visit])
-
     val testSchema: StructType =
       StructType(
         StructField("uid", StringType) ::
@@ -76,25 +73,22 @@ object test {
       .options(kafkaOptions)
       .load
       .select(
-        from_json(col("value").cast(StringType), testSchema).as("json")
+        from_json($"value".cast(StringType), testSchema).as("json")
       )
       .select(
         testSchema.fields.map { field =>
           col(s"json.${field.name}").as(field.name)
         }: _*
       )
-//      .as[TestData]
-
-//    case class ClearedTestData(uid: String, domain: String, url: String)
 
     val clearedDS: DataFrame = testDS
-      .withColumn("visits", explode_outer(col("visits")))
+      .withColumn("visits", explode_outer($"visits"))
       .withColumn(
         "pre_url",
         regexp_replace(
           regexp_replace(
             regexp_replace(
-              col("visits.url"),
+              $"visits.url",
               "(http(s)?:\\/\\/https(:)?\\/\\/)",
               "https:\\/\\/"
             ),
@@ -107,32 +101,28 @@ object test {
       )
       .withColumn(
         "domain",
-        lower(trim(callUDF("parse_url", col("pre_url"), lit("HOST"))))
+        lower(trim(callUDF("parse_url", $"pre_url", lit("HOST"))))
       )
-      .withColumn("url", col("visits.url"))
+      .withColumn("url", $"visits.url")
       .drop("visits")
-//      .as[ClearedTestData]
-
-//    case class TestFeatures(uid: String, domains: Array[String])
 
     val featuresDS: DataFrame =
       clearedDS
-        .groupBy(col("uid"))
+        .groupBy($"uid")
         .agg(
-          collect_list(col("domain")).as("domains"),
+          collect_list($"domain").as("domains"),
           clearedDS.columns
             .filterNot(List("uid", "domain").contains(_))
             .map(nm => max(col(nm)).as(nm)): _*
         )
         .select(
-          col("uid") +:
+          $"uid" +:
             clearedDS.columns
               .filterNot(List("uid", "domain").contains(_))
               .map(col) :+
-            col("domains"): _*
+            $"domains": _*
         )
         .drop("timestamp")
-//        .as[TestFeatures]
 
     val model: PipelineModel = PipelineModel.load(hdfsModelPath)
 
@@ -142,8 +132,8 @@ object test {
       .select(
         to_json(
           struct(
-            col("uid"),
-            col("prediction_gender_age").as("gender_age")
+            $"uid",
+            $"prediction_gender_age".as("gender_age")
           )
         ).as("value")
       )

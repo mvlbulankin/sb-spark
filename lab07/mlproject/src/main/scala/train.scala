@@ -37,10 +37,6 @@ object train {
     val hdfsModelPath: String = spark.conf.get("spark.mlproject.model_dir",
       "/user/mihail.bulankin/labs/lab07/model")
 
-//    case class Visit(timestamp: Long, url: String)
-
-//    case class TrainData(uid: String, gender_age: String, visits: Array[Visit])
-
     val trainSchema: StructType =
       StructType(
         StructField("uid", StringType) ::
@@ -61,14 +57,6 @@ object train {
       .schema(trainSchema)
       .option("inferSchema", "false")
       .load(hdfsDataPath)
-//      .as[TrainData]
-
-//    case class ClearedTrainData(
-//        uid: String,
-//        gender_age: String,
-//        domain: String,
-//        url: String
-//    )
 
     val clearedDS: DataFrame = trainDS
       .withColumn("visits", explode_outer($"visits"))
@@ -94,13 +82,6 @@ object train {
       )
       .withColumn("url", $"visits.url")
       .drop("visits")
-//      .as[ClearedTrainData]
-
-//    case class TrainFeatures(
-//        uid: String,
-//        gender_age: String,
-//        domains: Array[String]
-//    )
 
     val featuresDS: DataFrame = clearedDS
       .groupBy($"uid")
@@ -118,7 +99,6 @@ object train {
           $"domains": _*
       )
       .drop("timestamp")
-//      .as[TrainFeatures]
 
     val countVectorizer: CountVectorizer = new CountVectorizer()
       .setInputCol("domains")

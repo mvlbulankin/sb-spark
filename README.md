@@ -38,9 +38,14 @@
 + cd lab07/mlproject
 + sbt package
 ### training
-+ spark-submit --class train target/scala-2.11/mlproject_2.11-1.0.jar 
++ spark-submit --class train target/scala-2.11/mlproject_2.11-1.0.jar
 ### inference
-+ spark-submit --class test --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.4.7 target/scala-2.11/mlproject_2.11-1.0.jar  
++ spark-submit --class test --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.4.7 target/scala-2.11/mlproject_2.11-1.0.jar
+
+### create kafka topic
++ /usr/hdp/current/kafka-broker/bin/kafka-topics.sh --create --topic mihail_bulankin_lab07_out --zookeeper spark-node-1.newprolab.com:2181 --partitions 1 --replication-factor 1
+### clear kafka topic
++ /usr/hdp/current/kafka-broker/bin/kafka-topics.sh --zookeeper spark-node-1.newprolab.com:2181 --delete --topic mihail_bulankin_lab07_out
 
 ## download file from server
 + scp -i ~/.ssh/id_rsa_spark_de -r mihail.bulankin@spark-master-2.newprolab.com:/data/home/mihail.bulankin/ml-100k /Users/m.bulankin/spark_de_course/lab01
