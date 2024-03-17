@@ -35,15 +35,15 @@
 + spark-submit --class features .target/scala-2.11/features_2.11-1.0.jar
 
 ## launch lab07
-cd lab07/mlproject
-sbt package
++ cd lab07/mlproject
++ sbt package
 ### training
-spark-submit --class train target/scala-2.11/mlproject_2.11-1.0.jar 
++ spark-submit --class train target/scala-2.11/mlproject_2.11-1.0.jar 
 ### inference
-spark-submit --class test --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.4.7 target/scala-2.11/mlproject_2.11-1.0.jar  
++ spark-submit --class test --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.4.7 target/scala-2.11/mlproject_2.11-1.0.jar  
 
 ## download file from server
-scp -i ~/.ssh/id_rsa_spark_de -r mihail.bulankin@spark-master-2.newprolab.com:/data/home/mihail.bulankin/ml-100k /Users/m.bulankin/spark_de_course/lab01
++ scp -i ~/.ssh/id_rsa_spark_de -r mihail.bulankin@spark-master-2.newprolab.com:/data/home/mihail.bulankin/ml-100k /Users/m.bulankin/spark_de_course/lab01
 
 ## upload file to server
-scp -i ~/.ssh/id_rsa_spark_de -r lab01.json mihail.bulankin@spark-master-2.newprolab.com:/data/home/mihail.bulankin
++ scp -i ~/.ssh/id_rsa_spark_de -r lab01.json mihail.bulankin@spark-master-2.newprolab.com:/data/home/mihail.bulankin

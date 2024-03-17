@@ -1,4 +1,4 @@
-import org.apache.spark.sql.{Dataset, SparkSession}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.ml.{Pipeline, PipelineModel}
 import org.apache.spark.ml.classification.LogisticRegression
 import org.apache.spark.ml.feature.{
@@ -37,9 +37,9 @@ object train {
     val hdfsModelPath: String = spark.conf.get("spark.mlproject.model_dir",
       "/user/mihail.bulankin/labs/lab07/model")
 
-    case class Visit(timestamp: Long, url: String)
+//    case class Visit(timestamp: Long, url: String)
 
-    case class TrainData(uid: String, gender_age: String, visits: Array[Visit])
+//    case class TrainData(uid: String, gender_age: String, visits: Array[Visit])
 
     val trainSchema: StructType =
       StructType(
@@ -56,28 +56,28 @@ object train {
           ) :: Nil
       )
 
-    val trainDS: Dataset[TrainData] = spark.read
+    val trainDS: DataFrame = spark.read
       .format("json")
       .schema(trainSchema)
       .option("inferSchema", "false")
       .load(hdfsDataPath)
-      .as[TrainData]
+//      .as[TrainData]
 
-    case class ClearedTrainData(
-        uid: String,
-        gender_age: String,
-        domain: String,
-        url: String
-    )
+//    case class ClearedTrainData(
+//        uid: String,
+//        gender_age: String,
+//        domain: String,
+//        url: String
+//    )
 
-    val clearedDS: Dataset[ClearedTrainData] = trainDS
-      .withColumn("visits", explode_outer(col("visits")))
+    val clearedDS: DataFrame = trainDS
+      .withColumn("visits", explode_outer($"visits"))
       .withColumn(
         "pre_url",
         regexp_replace(
           regexp_replace(
             regexp_replace(
-              col("visits.url"),
+              $"visits.url",
               "(http(s)?:\\/\\/https(:)?\\/\\/)",
               "https:\\/\\/"
             ),
@@ -90,20 +90,20 @@ object train {
       )
       .withColumn(
         "domain",
-        lower(trim(callUDF("parse_url", col("pre_url"), lit("HOST"))))
+        lower(trim(callUDF("parse_url", $"pre_url", lit("HOST"))))
       )
-      .withColumn("url", col("visits.url"))
+      .withColumn("url", $"visits.url")
       .drop("visits")
-      .as[ClearedTrainData]
+//      .as[ClearedTrainData]
 
-    case class TrainFeatures(
-        uid: String,
-        gender_age: String,
-        domains: Array[String]
-    )
+//    case class TrainFeatures(
+//        uid: String,
+//        gender_age: String,
+//        domains: Array[String]
+//    )
 
-    val featuresDS: Dataset[TrainFeatures] = clearedDS
-      .groupBy(col("uid"))
+    val featuresDS: DataFrame = clearedDS
+      .groupBy($"uid")
       .agg(
         collect_list(col("domain")).as("domains"),
         clearedDS.columns
@@ -111,14 +111,14 @@ object train {
           .map(nm => max(col(nm)).as(nm)): _*
       )
       .select(
-        col("uid") +:
+        $"uid" +:
           clearedDS.columns
             .filterNot(List("uid", "domain").contains(_))
             .map(col) :+
-          col("domains"): _*
+          $"domains": _*
       )
       .drop("timestamp")
-      .as[TrainFeatures]
+//      .as[TrainFeatures]
 
     val countVectorizer: CountVectorizer = new CountVectorizer()
       .setInputCol("domains")
