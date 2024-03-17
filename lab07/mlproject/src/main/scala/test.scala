@@ -54,8 +54,8 @@ object test {
         "subscribe" -> kafkaTestInputTopic
       )
 
-    case class Visit(timestamp: Long, url: String)
-    case class TestData(uid: String, visits: Array[Visit])
+//    case class Visit(timestamp: Long, url: String)
+//    case class TestData(uid: String, visits: Array[Visit])
 
     val testSchema: StructType =
       StructType(
@@ -71,7 +71,7 @@ object test {
           ) :: Nil
       )
 
-    val testDS: Dataset[TestData] = spark.readStream
+    val testDS: DataFrame = spark.readStream
       .format("kafka")
       .options(kafkaOptions)
       .load
@@ -83,11 +83,11 @@ object test {
           col(s"json.${field.name}").as(field.name)
         }: _*
       )
-      .as[TestData]
+//      .as[TestData]
 
-    case class ClearedTestData(uid: String, domain: String, url: String)
+//    case class ClearedTestData(uid: String, domain: String, url: String)
 
-    val clearedDS: Dataset[ClearedTestData] = testDS
+    val clearedDS: DataFrame = testDS
       .withColumn("visits", explode_outer(col("visits")))
       .withColumn(
         "pre_url",
@@ -111,11 +111,11 @@ object test {
       )
       .withColumn("url", col("visits.url"))
       .drop("visits")
-      .as[ClearedTestData]
+//      .as[ClearedTestData]
 
-    case class TestFeatures(uid: String, domains: Array[String])
+//    case class TestFeatures(uid: String, domains: Array[String])
 
-    val featuresDS: Dataset[TestFeatures] =
+    val featuresDS: DataFrame =
       clearedDS
         .groupBy(col("uid"))
         .agg(
@@ -132,7 +132,7 @@ object test {
             col("domains"): _*
         )
         .drop("timestamp")
-        .as[TestFeatures]
+//        .as[TestFeatures]
 
     val model: PipelineModel = PipelineModel.load(hdfsModelPath)
 
